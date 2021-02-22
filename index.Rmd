@@ -2,36 +2,19 @@
 title: "Portfolio"
 author: "Niels Rouws, 12177555"
 date: "2/10/2021"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
 ---
 
 PLEASE DO NOT SHOW THIS PORTFOLIO IN CLASS
-
-# Comparing the Rock genre over fours decades 60s-10s
-
-Spotify has 6 playlist called the XXs Rock Anthems for the decades 60s, 70s, 80s, 90s, 00s, and 10s. I'm interested
-in how rock has evolved from the 60s to the 10s. Multiple bands have made music spanning more than one decade
-and I would like to investigate how their earlier work compares to their later works and whether bands have
-influenced each other. Moreover when large subgenres of rock started to appear and which bands were responsible. 
-There are three main groups to compare: the early bands from the 60s and 70s, the middle 
-80 and 90s bands, and late 00s and 10s. 
-
-The use of more digital elements in music will probably increase over the years, and more subgenres are likely to have
-emerged over the years. I am unsure in what way the bands have influenced each other if any at all.
-
-The tracks are all popular songs from their respective time periods but not all songs are original. 
-Especially among the older songs are a lot of remastered versions. Another downside is the small 
-amount of songs representing a complete decade of song releases. 
-
-Atypical bands might be bands like Queen which is known for releasing songs in a multitude of genres 
-and bands that have released albums spanning multiple decades. Typical bands might be bands like U2 that appear 
-in one playlist with multiple songs.
-
 
 ```{r, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
 
 library(tidyverse)
 library(spotifyr)
+library(flexdashboard)
+library(plotly)
 
 ```
 
@@ -59,19 +42,43 @@ rock <-
 
 ```
 
-## The corpus
+Introduction
+=========================================
 
-The current corpus has a lack of data representing the last two decades and the 
-90s are over-represented. Furthermore the current data might not be the best 
-to represent the decennia since they have not yet been verified using the 
-hit-charts of their respective decade.
+### Comparing the Rock genre over fours decades 60s-10s
 
+Spotify has 6 playlist called the XXs Rock Anthems for the decades 60s, 70s, 80s, 90s, 00s, and 10s. I'm interested
+in how rock has evolved from the 60s to the 10s. Multiple bands have made music spanning more than one decade
+and I would like to investigate how their earlier work compares to their later works and whether bands have
+influenced each other. Moreover when large subgenres of rock started to appear and which bands were responsible. 
+There are three main groups to compare: the early bands from the 60s and 70s, the middle 
+80 and 90s bands, and late 00s and 10s. 
+
+The use of more digital elements in music will probably increase over the years, and more subgenres are likely to have
+emerged over the years. I am unsure in what way the bands have influenced each other if any at all.
+
+The tracks are all popular songs from their respective time periods but not all songs are original. 
+Especially among the older songs are a lot of remastered versions. Another downside is the small 
+amount of songs representing a complete decade of song releases. 
+
+Atypical bands might be bands like Queen which is known for releasing songs in a multitude of genres 
+and bands that have released albums spanning multiple decades. Typical bands might be bands like U2 that appear 
+in one playlist with multiple songs.
+
+
+
+
+Analysis {.storyboard}
+=========================================
+
+### The corpus
 
 ```{r, echo=FALSE}
 ggplot(
   rock,
   aes(
-    x = category
+    x = category,
+    fill = category
   )
 ) +
   geom_bar() + 
@@ -81,23 +88,14 @@ ggplot(
 
 ```
 
-## Acousticness
+***
 
-The current data shows that over the years the acousticness has significantly 
-decreased. From the 1980s a significant drop in acousticness can be seen in 
-the data. The 1960s and 1970s show a wide distribution which narrows and shifts
-towards no acousticness at all. The 2000s seems the decade with the least
-acousticness as even the outliers don't exceed 0.12 on the scale. The 2010s see
-the acoustic outliers returning with "Way down We Go" from KALEO as most
-acoustic song.
+The current corpus has a lack of data representing the last two decades and the 
+90s are over-represented. Furthermore the current data might not be the best 
+to represent the decennia since they have not yet been verified using the 
+hit-charts of their respective decade.
 
-
-The distribution along the modes don't seem to have a significant preference for
-more or less acousticness only the 1960s and 1980s show dissimilar
-distributions per mode. Minor songs favor more acousticsness in the 1960s and
-the 1980s is reversed, favoring less acousticness.
-
-
+### Acousticness
 
 
 ```{r, echo=FALSE}
@@ -114,16 +112,32 @@ ggplot(
     position = position_dodge(width = 0.5),
     outlier.alpha = 0.6,
   ) +
-  geom_text(aes(label=ifelse(track.name=="Way down We Go", "Way down We Go", "")), hjust = 0.5, vjust=-1) +
+  geom_text(aes(label=ifelse(track.name=="Way down We Go", "Way down We Go", "")), hjust = 0.8, vjust=0) +
   theme(legend.position = c(0.9, 0.9)) +
   labs(title = " Distribution of acousticness per decennia per mode")
 
 ```
 
-## Valence 
+***
 
-The valence appears to barely have changed in the first three decades with a 
-small drop to the last three decades.
+The current data shows that over the years the acousticness has significantly 
+decreased. From the 1980s a significant drop in acousticness can be seen in 
+the data. The 1960s and 1970s show a wide distribution which narrows and shifts
+towards no acousticness at all. The 2000s seems the decade with the least
+acousticness as even the outliers don't exceed 0.12 on the scale. The 2010s see
+the acoustic outliers returning with "Way down We Go" from KALEO as most
+acoustic song.
+
+
+The distribution along the modes don't seem to have a significant preference for
+more or less acousticness only the 1960s and 1980s show dissimilar
+distributions per mode. Minor songs favor more acousticsness in the 1960s and
+the 1980s is reversed, favoring less acousticness.
+
+
+### Valence 
+
+
 
 ```{r, echo=FALSE}
 ggplot(
@@ -142,21 +156,22 @@ ggplot(
   labs(title = "Distribution of valence per decennia per mode")
 ```
 
-## Loudness & Energy
+***
 
-Comparing the energy related to loudness per decade show very similar clouds of
-data points. The 2000s and 2010s appear to lack songs in the lower ranges of 
-loudness but this could be due to the fact that the playlists have less data
-points.
+The valence appears to barely have changed in the first three decades with a 
+small drop to the last three decades.
+
+### Loudness & Energy
 
 
 ```{r, echo=FALSE}
-ggplot(
+plot_le <- ggplot(
   rock,
   aes(
     x = loudness,
     y = energy,
-    color = category
+    color = category,
+    name = track.name
   )
 ) +
   geom_smooth(method = "loess", formula = "y ~ x") + 
@@ -166,5 +181,15 @@ ggplot(
   labs(
     title = "Energy related to loudness per decennium."
   )
+
+
+ggplotly(plot_le, tooltip=c("track.name", "x", "y"))
+
 ```
 
+***
+
+Comparing the energy related to loudness per decade show very similar clouds of
+data points. The 2000s and 2010s appear to lack songs in the lower ranges of 
+loudness but this could be due to the fact that the playlists have less data
+points.
