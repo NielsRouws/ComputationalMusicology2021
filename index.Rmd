@@ -15,6 +15,7 @@ library(tidyverse)
 library(spotifyr)
 library(flexdashboard)
 library(plotly)
+library(compmus)
 
 ```
 
@@ -41,6 +42,121 @@ rock <-
   )
 
 ```
+
+
+=========================================
+
+### Comparing Pink Floyd & Muse
+
+
+
+
+```{r, echo=FALSE}
+
+floyd <-
+  get_tidy_audio_analysis("5HNCy40Ni5BZJFw1TKzRsC") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+)
+
+muse <-
+  get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+
+
+
+
+bind_rows(
+  floyd %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  floyd %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_gray() +
+  labs(title = "Comfortably Numb - Pink Floyd", x = "Time (min)", y = "Time (min)") +
+  scale_y_time() +
+  scale_x_time()
+
+bind_rows(
+  muse %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  muse %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_gray() +
+  labs(title = "Supermassive Black Hole - Muse", x = "Time (min)", y = "Time (min)") +
+  scale_y_time() +
+  scale_x_time()
+
+```
+
+Pink Floyd's Conformtably Numb from the 70s and Muse's are both classic rock
+songs and share some similarities as can be seen in their self-similarity 
+matrices. 
+
+
 
 Introduction
 =========================================
