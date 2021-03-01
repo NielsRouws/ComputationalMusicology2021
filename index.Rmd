@@ -99,16 +99,6 @@ bind_rows(
   scale_x_time()
 
 ```
-***
-
-Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
-songs and share some similarities as can be seen in their self-similarity 
-matrices. 
-
-Patterns that emerge from the chroma-based self-similarity matrices are short 
-dark diagonal paths. Especially looking a Muse's song we see blocks with these
-paths each time the chorus starts. 
-
 
 ### Muse
 
@@ -165,15 +155,16 @@ bind_rows(
 
 ```
 
-***
+### Comparising "Comfortably Numb" and "Supermassive Black Hole"
 
 Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
 songs and share some similarities as can be seen in their self-similarity 
 matrices. 
 
 Patterns that emerge from the chroma-based self-similarity matrices are short 
-dark diagonal paths. Especially looking a Muse's song we see blocks with these
-paths each time the chorus starts. 
+dark diagonal paths. Especially looking a Muse's song we can clearly see
+the same blocks with these paths each time the pre-chorus and chorus play.
+The darker blocks are the verses characterized as a riff with vocals. The timbre-based changes show comparable patterns but have a clear difference around the 2:30. This is when the guitar solo plays and is clearly unique from other parts of the song. 
 
 
 Introduction
