@@ -44,6 +44,7 @@ rock <-
 ```
 
 
+Self-Similarity
 =========================================
 
 ### Comparing Pink Floyd & Muse
@@ -73,29 +74,6 @@ floyd <-
       )
 )
 
-muse <-
-  get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
-  compmus_align(bars, segments) %>%
-  select(bars) %>%
-  unnest(bars) %>%
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "acentre", norm = "manhattan"
-      )
-  ) %>%
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-  )
-
-
-
-
 bind_rows(
   floyd %>%
     compmus_self_similarity(pitches, "aitchison") %>%
@@ -122,6 +100,30 @@ bind_rows(
   labs(title = "Comfortably Numb - Pink Floyd", x = "Time (min)", y = "Time (min)") +
   scale_y_time() +
   scale_x_time()
+
+```
+```{r, echo=FALSE}
+
+muse <-
+  get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+
 
 bind_rows(
   muse %>%
@@ -152,10 +154,15 @@ bind_rows(
 
 ```
 
-Pink Floyd's Conformtably Numb from the 70s and Muse's are both classic rock
+***
+
+Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
 songs and share some similarities as can be seen in their self-similarity 
 matrices. 
 
+Patterns that emerge from the chroma-based self-similarity matrices are short 
+dark diagonal paths. Especially looking a Muse's song we see blocks with these
+paths each time the chorus starts. 
 
 
 Introduction
