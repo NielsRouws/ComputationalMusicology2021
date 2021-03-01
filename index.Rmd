@@ -47,10 +47,7 @@ rock <-
 Self-Similarity
 =========================================
 
-### Comparing Pink Floyd & Muse
-
-
-
+### Pink Floyd
 
 ```{r, echo=FALSE}
 
@@ -102,6 +99,20 @@ bind_rows(
   scale_x_time()
 
 ```
+***
+
+Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
+songs and share some similarities as can be seen in their self-similarity 
+matrices. 
+
+Patterns that emerge from the chroma-based self-similarity matrices are short 
+dark diagonal paths. Especially looking a Muse's song we see blocks with these
+paths each time the chorus starts. 
+
+
+### Muse
+
+
 ```{r, echo=FALSE}
 
 muse <-
