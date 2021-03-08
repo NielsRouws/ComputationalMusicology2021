@@ -20,12 +20,12 @@ library(compmus)
 ```
 
 ```{r, echo=FALSE}
-rock60s <- get_playlist_audio_features("", "37i9dQZF1DWWzBc3TOlaAV")
-rock70s <- get_playlist_audio_features("", "37i9dQZF1DWWwzidNQX6jx")
-rock80s <- get_playlist_audio_features("", "37i9dQZF1DX1spT6G94GFC")
-rock90s <- get_playlist_audio_features("", "37i9dQZF1DX1rVvRgjX59F")
-rock00s <- get_playlist_audio_features("", "37i9dQZF1DX3oM43CtKnRV")
-rock10s <- get_playlist_audio_features("", "37i9dQZF1DX99DRG9N39X3")
+rock60s <- get_playlist_audio_features("", "37i9dQZF1DWWzBc3TOlaAV") %>% add_audio_analysis()
+rock70s <- get_playlist_audio_features("", "37i9dQZF1DWWwzidNQX6jx") %>% add_audio_analysis()
+rock80s <- get_playlist_audio_features("", "37i9dQZF1DX1spT6G94GFC") %>% add_audio_analysis()
+rock90s <- get_playlist_audio_features("", "37i9dQZF1DX1rVvRgjX59F") %>% add_audio_analysis()
+rock00s <- get_playlist_audio_features("", "37i9dQZF1DX3oM43CtKnRV") %>% add_audio_analysis()
+rock10s <- get_playlist_audio_features("", "37i9dQZF1DX99DRG9N39X3") %>% add_audio_analysis()
 
 
 rock <-
@@ -43,130 +43,112 @@ rock <-
 
 ```
 
+```{r, echo=FALSE}
 
-Self-Similarity
+circshift <- function(v, n) {
+  if (n == 0) v else c(tail(v, n), head(v, -n))
+}
+
+#      C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B
+major_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
+minor_chord <-
+  c(   1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
+seventh_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+
+chord_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:7", circshift(seventh_chord, 6),
+    "Gb:maj", circshift(major_chord, 6),
+    "Bb:min", circshift(minor_chord, 10),
+    "Db:maj", circshift(major_chord, 1),
+    "F:min", circshift(minor_chord, 5),
+    "Ab:7", circshift(seventh_chord, 8),
+    "Ab:maj", circshift(major_chord, 8),
+    "C:min", circshift(minor_chord, 0),
+    "Eb:7", circshift(seventh_chord, 3),
+    "Eb:maj", circshift(major_chord, 3),
+    "G:min", circshift(minor_chord, 7),
+    "Bb:7", circshift(seventh_chord, 10),
+    "Bb:maj", circshift(major_chord, 10),
+    "D:min", circshift(minor_chord, 2),
+    "F:7", circshift(seventh_chord, 5),
+    "F:maj", circshift(major_chord, 5),
+    "A:min", circshift(minor_chord, 9),
+    "C:7", circshift(seventh_chord, 0),
+    "C:maj", circshift(major_chord, 0),
+    "E:min", circshift(minor_chord, 4),
+    "G:7", circshift(seventh_chord, 7),
+    "G:maj", circshift(major_chord, 7),
+    "B:min", circshift(minor_chord, 11),
+    "D:7", circshift(seventh_chord, 2),
+    "D:maj", circshift(major_chord, 2),
+    "F#:min", circshift(minor_chord, 6),
+    "A:7", circshift(seventh_chord, 9),
+    "A:maj", circshift(major_chord, 9),
+    "C#:min", circshift(minor_chord, 1),
+    "E:7", circshift(seventh_chord, 4),
+    "E:maj", circshift(major_chord, 4),
+    "G#:min", circshift(minor_chord, 8),
+    "B:7", circshift(seventh_chord, 11),
+    "B:maj", circshift(major_chord, 11),
+    "D#:min", circshift(minor_chord, 3)
+  )
+```
+
+Track-level analysis
 =========================================
 
 ### Pink Floyd
 
+
 ```{r, echo=FALSE}
 
-floyd <-
-  get_tidy_audio_analysis("5HNCy40Ni5BZJFw1TKzRsC") %>%
-  compmus_align(bars, segments) %>%
-  select(bars) %>%
-  unnest(bars) %>%
+rock %>%
   mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "acentre", norm = "manhattan"
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, loudness, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
       )
   ) %>%
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-)
-
-bind_rows(
-  floyd %>%
-    compmus_self_similarity(pitches, "aitchison") %>%
-    mutate(d = d / max(d), type = "Chroma"),
-  floyd %>%
-    compmus_self_similarity(timbre, "euclidean") %>%
-    mutate(d = d / max(d), type = "Timbre")
-) %>%
-  mutate() %>%
+  unnest(sections) %>%
   ggplot(
     aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
+      x = tempo,
+      y = tempo_section_sd,
+      colour = category,
+      alpha = loudness
     )
   ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_gray() +
-  labs(title = "Comfortably Numb - Pink Floyd", x = "Time (min)", y = "Time (min)") +
-  scale_y_time() +
-  scale_x_time()
-
-```
-
-### Muse
-
-
-```{r, echo=FALSE}
-
-muse <-
-  get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
-  compmus_align(bars, segments) %>%
-  select(bars) %>%
-  unnest(bars) %>%
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "acentre", norm = "manhattan"
-      )
-  ) %>%
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  facet_wrap(~category) +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Decade",
+    size = "Duration (min)",
+    alpha = "Volume (dBFS)"
   )
 
-
-bind_rows(
-  muse %>%
-    compmus_self_similarity(pitches, "aitchison") %>%
-    mutate(d = d / max(d), type = "Chroma"),
-  muse %>%
-    compmus_self_similarity(timbre, "euclidean") %>%
-    mutate(d = d / max(d), type = "Timbre")
-) %>%
-  mutate() %>%
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_gray() +
-  labs(title = "Supermassive Black Hole - Muse", x = "Time (min)", y = "Time (min)") +
-  scale_y_time() +
-  scale_x_time()
-
 ```
 
-### Comparising "Comfortably Numb" and "Supermassive Black Hole"
+***
 
-Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
-songs and share some similarities as can be seen in their self-similarity 
-matrices. 
-
-Patterns that emerge from the chroma-based self-similarity matrices are short 
-dark diagonal paths. Especially looking a Muse's song we can clearly see
-the same blocks with these paths each time the pre-chorus and chorus play.
-The darker blocks are the verses characterized as a riff with vocals. The timbre-based changes show comparable patterns but have a clear difference around the 2:30. This is when the guitar solo plays and is clearly unique from other parts of the song. 
-
-The changes in Comfortably Numb are less obvious but the pattern is checkerboard-like as in Muse's song. Easiest to spot are the transitions from intro around the 1 minute mark and to the long outro solo around the 4:30 minutes.
+Changes in mean tempo and standard deviation can seen. The 60s has a
+dense cloud around 140 BPM with a standard deviation just below 2. In the 70s 
+the dense cloud has dispersed but the center is still around these values. The 
+following two decades see the distribution shift towards lower tempos and less
+variability. From the 00s onward especially the variability in tempo has
+decreased with only a few exceeding a standard deviation of 2. The mean tempo
+is more spread out compared the 80s and 90s that are skewed towards lower tempo.
 
 
 Introduction
@@ -320,3 +302,132 @@ Comparing the energy related to loudness per decade show very similar clouds of
 data points. The 2000s and 2010s appear to lack songs in the lower ranges of 
 loudness but this could be due to the fact that the playlists have less data
 points.
+
+
+
+Self-Similarity
+=========================================
+
+### Pink Floyd
+
+```{r, echo=FALSE}
+
+floyd <-
+  get_tidy_audio_analysis("5HNCy40Ni5BZJFw1TKzRsC") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+)
+
+bind_rows(
+  floyd %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  floyd %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_light() +
+  labs(title = "Comfortably Numb - Pink Floyd", x = "Time (min)", y = "Time (min)") +
+  scale_y_time() +
+  scale_x_time()
+
+```
+
+### Muse
+
+
+```{r, echo=FALSE}
+
+muse <-
+  get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+
+
+bind_rows(
+  muse %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  muse %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_light() +
+  labs(title = "Supermassive Black Hole - Muse", x = "Time (min)", y = "Time (min)") +
+  scale_y_time() +
+  scale_x_time()
+
+```
+
+### Comparising "Comfortably Numb" and "Supermassive Black Hole"
+
+Pink Floyd's Comfortably Numb from the 70s and Muse's are both classic rock
+songs and share some similarities as can be seen in their self-similarity 
+matrices. 
+
+Patterns that emerge from the chroma-based self-similarity matrices are short 
+dark diagonal paths. Especially looking a Muse's song we can clearly see
+the same blocks with these paths each time the pre-chorus and chorus play.
+The darker blocks are the verses characterized as a riff with vocals. The timbre-based changes show comparable patterns but have a clear difference around the 2:30. This is when the guitar solo plays and is clearly unique from other parts of the song. 
+
+The changes in Comfortably Numb are less obvious but the pattern is checkerboard-like as in Muse's song. Easiest to spot are the transitions from intro around the 1 minute mark and to the long outro solo around the 4:30 minutes.
+
+
+
