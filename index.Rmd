@@ -101,7 +101,7 @@ chord_templates <-
 Track-level analysis
 =========================================
 
-### Pink Floyd
+### Tempo
 
 
 ```{r, echo=FALSE}
@@ -140,7 +140,7 @@ rock %>%
 
 ```
 
-***
+### Analysis
 
 Changes in mean tempo and standard deviation can seen. The 60s has a
 dense cloud around 140 BPM with a standard deviation just below 2. In the 70s 
