@@ -19,7 +19,7 @@ library(compmus)
 
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 rock60s <- get_playlist_audio_features("", "37i9dQZF1DWWzBc3TOlaAV") %>% add_audio_analysis()
 rock70s <- get_playlist_audio_features("", "37i9dQZF1DWWwzidNQX6jx") %>% add_audio_analysis()
 rock80s <- get_playlist_audio_features("", "37i9dQZF1DX1spT6G94GFC") %>% add_audio_analysis()
@@ -98,57 +98,55 @@ chord_templates <-
   )
 ```
 
-Track-level analysis
+Tempo
 =========================================
 
-### Tempo
+### Led Zeppelin - Stairway to Heaven
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 
-rock %>%
-  mutate(
-    sections =
-      map(
-        sections,                                    # sections or segments
-        summarise_at,
-        vars(tempo, loudness, duration),             # features of interest
-        list(section_mean = mean, section_sd = sd)   # aggregation functions
-      )
-  ) %>%
-  unnest(sections) %>%
-  ggplot(
-    aes(
-      x = tempo,
-      y = tempo_section_sd,
-      colour = category,
-      alpha = loudness
-    )
-  ) +
-  geom_point(aes(size = duration / 60)) +
-  geom_rug() +
-  facet_wrap(~category) +
-  theme_minimal() +
-  ylim(0, 5) +
-  labs(
-    x = "Mean Tempo (bpm)",
-    y = "SD Tempo",
-    colour = "Decade",
-    size = "Duration (min)",
-    alpha = "Volume (dBFS)"
-  )
+zeppelin <- get_tidy_audio_analysis("5CQ30WqJwcep0pYcV4AMNc")
+
+zeppelin %>%
+  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) %>%
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(title = "Tempogram Led Zeppelin - Stairway to Heaven", x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
 
 ```
 
+
+### Queen - Bohemian Rhapsody
+
+```{r, echo=FALSE, cache=TRUE}
+
+rhapsody <- get_tidy_audio_analysis("2GAIycsMaDVtMtdvxzR2xI")
+
+rhapsody %>%
+  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) %>%
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(title = "Tempogram Queen - Bohemian Rhapsody", x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
+
+```
+
+
+
 ### Analysis
 
-Changes in mean tempo and standard deviation can seen. The 60s has a
-dense cloud around 140 BPM with a standard deviation just below 2. In the 70s 
-the dense cloud has dispersed but the center is still around these values. The 
-following two decades see the distribution shift towards lower tempos and less
-variability. From the 00s onward especially the variability in tempo has
-decreased with only a few exceeding a standard deviation of 2. The mean tempo
-is more spread out compared the 80s and 90s that are skewed towards lower tempo.
+Two iconic rock numbers have interesting tempi changes. Stairway to Heaven has 
+a constantly increasing tempo. Starting around 71 BPM the tempo bumps up to 
+around 82 BPM and continues to increase. At the end of verse 6, or 330 seconds,
+a transition and solo follow that have a peak BPM of just over 100 BPM. 
+
+Bohemian Rhapsody has iconic sections of different genres in the same song.
+The tempo change that stands out the most is the operatic section with a BPM of 
+146 starting around 190 seconds and ending around 240 seconds.
 
 
 Introduction
@@ -310,7 +308,7 @@ Self-Similarity
 
 ### Pink Floyd
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 
 floyd <-
   get_tidy_audio_analysis("5HNCy40Ni5BZJFw1TKzRsC") %>%
@@ -364,7 +362,7 @@ bind_rows(
 ### Muse
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, cache=TRUE}
 
 muse <-
   get_tidy_audio_analysis("3lPr8ghNDBLc2uZovNyLs9") %>%
@@ -429,5 +427,57 @@ The darker blocks are the verses characterized as a riff with vocals. The timbre
 
 The changes in Comfortably Numb are less obvious but the pattern is checkerboard-like as in Muse's song. Easiest to spot are the transitions from intro around the 1 minute mark and to the long outro solo around the 4:30 minutes.
 
+
+Track-level analysis
+=========================================
+
+### Tempo
+
+
+```{r, echo=FALSE}
+
+rock %>%
+  mutate(
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, loudness, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
+  ) %>%
+  unnest(sections) %>%
+  ggplot(
+    aes(
+      x = tempo,
+      y = tempo_section_sd,
+      colour = category,
+      alpha = loudness
+    )
+  ) +
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  facet_wrap(~category) +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Decade",
+    size = "Duration (min)",
+    alpha = "Volume (dBFS)"
+  )
+
+```
+
+### Analysis
+
+Changes in mean tempo and standard deviation can seen. The 60s has a
+dense cloud around 140 BPM with a standard deviation just below 2. In the 70s 
+the dense cloud has dispersed but the center is still around these values. The 
+following two decades see the distribution shift towards lower tempos and less
+variability. From the 00s onward especially the variability in tempo has
+decreased with only a few exceeding a standard deviation of 2. The mean tempo
+is more spread out compared the 80s and 90s that are skewed towards lower tempo.
 
 
