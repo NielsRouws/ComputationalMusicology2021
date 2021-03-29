@@ -21,27 +21,27 @@ library(gridExtra)
 ```
 
 ```{r, echo=FALSE, cache=TRUE}
-# rock60s <- get_playlist_audio_features("", "37i9dQZF1DWWzBc3TOlaAV") %>% add_audio_analysis()
-# rock70s <- get_playlist_audio_features("", "37i9dQZF1DWWwzidNQX6jx") %>% add_audio_analysis()
-# rock80s <- get_playlist_audio_features("", "37i9dQZF1DX1spT6G94GFC") %>% add_audio_analysis()
-# rock90s <- get_playlist_audio_features("", "37i9dQZF1DX1rVvRgjX59F") %>% add_audio_analysis()
-# rock00s <- get_playlist_audio_features("", "37i9dQZF1DX3oM43CtKnRV") %>% add_audio_analysis()
-# rock10s <- get_playlist_audio_features("", "37i9dQZF1DX99DRG9N39X3") %>% add_audio_analysis()
-# 
-# 
-# rock <-
-#   bind_rows(
-#     rock60s %>% mutate(category = "1960s"),
-#     rock70s %>% mutate(category = "1970s"),
-#     rock80s %>% mutate(category = "1980s"),
-#     rock90s %>% mutate(category = "1990s"),
-#     rock00s %>% mutate(category = "2000s"),
-#     rock10s %>% mutate(category = "2010s")
-#   ) %>%
-#   mutate(
-#     mode = ifelse(mode == 0, "Minor", "Major"),
-#     track.album.release_date = as.numeric(substr(track.album.release_date, 1, 4))
-#   )
+rock60s <- get_playlist_audio_features("", "37i9dQZF1DWWzBc3TOlaAV") %>% add_audio_analysis()
+rock70s <- get_playlist_audio_features("", "37i9dQZF1DWWwzidNQX6jx") %>% add_audio_analysis()
+rock80s <- get_playlist_audio_features("", "37i9dQZF1DX1spT6G94GFC") %>% add_audio_analysis()
+rock90s <- get_playlist_audio_features("", "37i9dQZF1DX1rVvRgjX59F") %>% add_audio_analysis()
+rock00s <- get_playlist_audio_features("", "37i9dQZF1DX3oM43CtKnRV") %>% add_audio_analysis()
+rock10s <- get_playlist_audio_features("", "37i9dQZF1DX99DRG9N39X3") %>% add_audio_analysis()
+
+
+rock <-
+  bind_rows(
+    rock60s %>% mutate(category = "1960s"),
+    rock70s %>% mutate(category = "1970s"),
+    rock80s %>% mutate(category = "1980s"),
+    rock90s %>% mutate(category = "1990s"),
+    rock00s %>% mutate(category = "2000s"),
+    rock10s %>% mutate(category = "2010s")
+  ) %>%
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major"),
+    track.album.release_date = as.numeric(substr(track.album.release_date, 1, 4))
+  )
 
 ```
 
@@ -270,9 +270,6 @@ plot_le1 <- ggplot(
     y = "Energy"
   ) +
   theme_light()
-
-
-
 
 
 ggplotly(plot_le1, tooltip=c("track.name", "x", "y", "size"))
