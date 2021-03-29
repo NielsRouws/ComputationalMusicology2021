@@ -137,24 +137,24 @@ hit-charts of their respective decade.
 
 ```{r, echo=FALSE}
 
-# plot_pop <- ggplot(
-#   rock,
-#   aes(
-#     x = track.album.release_date,
-#     y = track.popularity,
-#     color = category
-#   )) +
-#     geom_point( size = 2, alpha = 0.6) +
-#     labs(
-#     title = "Release date and popularity of songs",
-#     x = "Release date",
-#     y = "Popularity",
-#     legend.title = "Rock Anthem playlist"
-#   ) +
-#   theme_light() +
-#   scale_x_continuous(breaks = c(1960,1970,1980,1990,2000,2010))
-# 
-# ggplotly(plot_pop, tooltip=c("track.name", "x", "y"))
+plot_pop <- ggplot(
+  rock,
+  aes(
+    x = track.album.release_date,
+    y = track.popularity,
+    color = category
+  )) +
+    geom_point( size = 2, alpha = 0.6) +
+    labs(
+    title = "Release date and popularity of songs",
+    x = "Release date",
+    y = "Popularity",
+    legend.title = "Rock Anthem playlist"
+  ) +
+  theme_light() +
+  scale_x_continuous(breaks = c(1960,1970,1980,1990,2000,2010))
+
+ggplotly(plot_pop, tooltip=c("track.name", "x", "y"))
 
 ```
 
@@ -795,7 +795,7 @@ Classification {.storyboard}
 ***
 
 Training a classifier to distinguish did not yield positive results because of a lack of characteristic features and the 
-large overlap between the categories in the corpus. Based on the acousticness plots where a large drop in acousticness after
+large overlap between the categories in thttps://www.ziggo.nl/mailhe corpus. Based on the acousticness plots where a large drop in acousticness after
 the 70s and 80s a split between early rock and late rock might be able to be reliably trained.
 
 While the results are better and the most important feature is acousticness as expected the accuracy and precision were still
