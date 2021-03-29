@@ -71,8 +71,8 @@ and bands that have released albums spanning multiple decades. Typical bands mig
 in one playlist with multiple songs.
 
 The playlists will be analyzed on multiple levels. The decades as a collective shall be used to show trends and 
-the general characteristics of the playlists. For a more detailed comparison only look the most popular
-songs per decade or special cases will be analyzed. 
+the general characteristics of the playlists. For a more detailed comparisons I'll search among the most popular
+songs per decade or for special cases that show interesting results: 
 
 The two most popular songs per decade according to the Spotify API are:
 
@@ -182,25 +182,25 @@ Track-level Features {.storyboard}
 
 ```{r, echo=FALSE, cache=TRUE}
 
-# ggplot(
-#   rock,
-#   aes(
-#     x = category,
-#     y = acousticness,
-#     fill = mode
-#   )
-# ) +
-#   geom_boxplot(
-#     position = position_dodge(width = 0.5),
-#     outlier.alpha = 0.6,
-#   ) +
-#   geom_text(aes(label=ifelse(track.name=="Way down We Go", "Way down We Go", "")), hjust = 0.5, vjust=-0.5) +
-#   theme(legend.position = c(0.9, 0.9)) +
-#   labs(title = " Distribution of acousticness per decennia per mode")
+ggplot(
+  rock,
+  aes(
+    x = category,
+    y = acousticness,
+    fill = mode
+  )
+) +
+  geom_boxplot(
+    position = position_dodge(width = 0.5),
+    outlier.alpha = 0.6,
+  ) +
+  geom_text(aes(label=ifelse(track.name=="Way down We Go", "Way down We Go", "")), hjust = 0.5, vjust=-0.5) +
+  theme(legend.position = c(0.9, 0.9)) +
+  labs(title = " Distribution of acousticness per decennia per mode")
 
 ```
 
-<img src="./img/2_acousticness.png">
+<!-- <img src="./img/2_acousticness.png"> -->
 
 ***
 
@@ -324,7 +324,7 @@ ggplotly(plot_le2, tooltip=c("track.name", "x", "y", "size"))
 
 The distribution of danceability has not seen any huge changes over the decades. It's quite notable that 
 a wide range of dancebility is present in the playlists. The values range from low 0.25 songs to high 0.75 songs.
-with a few outliers such as the 80s song [Another One Bites The Dust - Remastered 2011 - Queen](https://open.spotify.com/track/57JVGBtBLCfHw2muk5416J?si=CxzaiY22QNOehHyo2EMqpA)
+with a few outliers such as the 80s song [Another One Bites The Dust (Remastered 2011) - Queen](https://open.spotify.com/track/57JVGBtBLCfHw2muk5416J?si=CxzaiY22QNOehHyo2EMqpA)
 
 
 
@@ -437,8 +437,14 @@ grid.arrange(plot_ssm1, plot_ssm2)
 
 ***
 
+The most popular 60s song compared to the most popular 10s song. [Fortunate Son - Creedance Clearwater Revival](https://open.spotify.com/track/4BP3uh0hFLFRb5cjsgLqDh?si=uxgBjQ8eTFCmeK5u7gNHrA)
+has a clear checkerboard structure with two horizontally striped bands right at the start of the song and on 1.15 minutes. These are the two episodes in the song without vocals when the electric 
+guitar is playing the riff over the drums without any vocals. The timbre plot of Fortunate Son has no big extremes except the short silence at the start and a vague band again on 1.15 minutes. 
 
-
+[Believer - Imagine Dragons](https://open.spotify.com/track/0pqnGHJpmpxLKifKRmU6WP?si=Lw12GL48SH6Ysu_zauCqvA) has a messier chroma-based self-similarity matrix. A checkerboard pattern can still
+vaguely be recognized as well as vague diagonal line that indicate something similar plays in two different parts of the song. The matrix is vertically split by a yellow line around 2 minutes
+in the song which is the short silence before a new chorus. Looking at the timbre-based self-similarity matrix the checkboard pattern is really clear with large blocks for the unique sounds of 
+the chorus and verses.
 
 
 ### Hotel California - Original versus Remaster
@@ -505,8 +511,13 @@ grid.arrange(plot_chroma, plot_dwt)
 
 ***
 
-[Hotel California 1976](https://open.spotify.com/track/1rh232CwAy3EDEWFJkwH88?si=L6fxlcitSMGN6NQr5kAeog)
-[Hotel California - 2013 Remaster](https://open.spotify.com/track/3yrSvpt2l1xhsV9Em88Pul?si=8Z8i1r_WSJ6QBmYICTwGMA)
+
+The chromagram show in yellow the melody line of [Hotel California - 2013 Remaster](https://open.spotify.com/track/3yrSvpt2l1xhsV9Em88Pul?si=8Z8i1r_WSJ6QBmYICTwGMA).
+The melody loops and becomes murkier or clearer depending on the other instruments. 
+
+Comparing the 2013 Remaster using Dynamic Time Warping with [Hotel California 1976](https://open.spotify.com/track/1rh232CwAy3EDEWFJkwH88?si=L6fxlcitSMGN6NQr5kAeog) you'd expect a darker 
+diagonal line along the diagonal of the plot but here it's absent. We do see a vague dark grid-like pattern over the plot where the darker diagonal paths are most likely the riffs in 
+both songs lining up. The ends seems to be another problem area witch significantly more yellow and interruption of the diagonal grid pattern. 
 
 
 Tempo and Timbre {.storyboard}
@@ -553,7 +564,9 @@ rock %>%
 
 ***
 
-Lorem ipsum
+
+Looking at the distribution of mean tempo's and their standard deviation it's visible that while 
+the higher BPMs are explored more frequently after the 1970s the standard deviation significantly reduces.
 
 
 ### Distribution of timbre coefficients
@@ -781,6 +794,13 @@ Classification {.storyboard}
 
 ***
 
+Training a classifier to distinguish did not yield positive results because of a lack of characteristic features and the 
+large overlap between the categories in the corpus. Based on the acousticness plots where a large drop in acousticness after
+the 70s and 80s a split between early rock and late rock might be able to be reliably trained.
+
+While the results are better and the most important feature is acousticness as expected the accuracy and precision were still
+far from promising. When plotting the 3 most important feature we can see why it's so difficult to split the groups. 
+The late rock overlaps with a large amount of early rock and with so little features that have large differences this group can't easily be split.
 
 
 
