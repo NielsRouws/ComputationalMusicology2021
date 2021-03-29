@@ -312,7 +312,8 @@ plot_le2 <- ggplot(
     y = "Danceability"
   ) +
   theme_light()
-ggplotly(plot_le2, tooltip=c("track.name", "x", "y", "size"))
+
+plot_le2
 
 ```
 
